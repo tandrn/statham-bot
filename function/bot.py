@@ -41,10 +41,7 @@ def build_quote_keyboard() -> InlineKeyboardMarkup:
 @router.message(CommandStart())
 async def cmd_start(message: Message) -> None:
     quote = get_random_quote()
-    caption = (
-        f'\U0001f3ac "{quote["text"]}"\n'
-        f"\u2014 \u0414\u0436\u0435\u0439\u0441\u043e\u043d \u0421\u0442\u0435\u0442\u0445\u0435\u043c"
-    )
+    caption = f'\U0001f9e0 "{quote["text"]}"'
     await message.answer_photo(
         photo=quote["image"],
         caption=caption,
@@ -55,10 +52,7 @@ async def cmd_start(message: Message) -> None:
 @router.message(Command("quote"))
 async def cmd_quote(message: Message) -> None:
     quote = get_random_quote()
-    caption = (
-        f'\U0001f3ac "{quote["text"]}"\n'
-        f"\u2014 \u0414\u0436\u0435\u0439\u0441\u043e\u043d \u0421\u0442\u0435\u0442\u0445\u0435\u043c"
-    )
+    caption = f'\U0001f9e0 "{quote["text"]}"'
     await message.answer_photo(
         photo=quote["image"],
         caption=caption,
@@ -69,13 +63,13 @@ async def cmd_quote(message: Message) -> None:
 @router.message(Command("help"))
 async def cmd_help(message: Message) -> None:
     text = (
-        "\U0001f916 <b>\u0411\u043e\u0442 \u041c\u0435\u043c\u043d\u044b\u0445 \u0426\u0438\u0442\u0430\u0442 \u0421\u0442\u0435\u0442\u0445\u0435\u043c\u0430</b>\n\n"
-        "\u041c\u0435\u043c\u043d\u044b\u0435 \u0446\u0438\u0442\u0430\u0442\u044b \u0434\u0436\u0435\u0439\u0441\u043e\u043d\u0430 \u0421\u0442\u0435\u0442\u0445\u0435\u043c\u0430 \u0441 \u0444\u043e\u0442\u043a\u0430\u043c\u0438! \U0001f4aa\n\n"
-        "<b>\u041a\u043e\u043c\u0430\u043d\u0434\u044b:</b>\n"
-        "/start \u2014 \u043f\u0440\u0438\u0432\u0435\u0442\u0441\u0442\u0432\u0438\u0435 + \u0446\u0438\u0442\u0430\u0442\u0430\n"
-        "/quote \u2014 \u0440\u0430\u043d\u0434\u043e\u043c\u043d\u0430\u044f \u0446\u0438\u0442\u0430\u0442\u0430\n"
-        "/help \u2014 \u044d\u0442\u0430 \u0441\u043f\u0440\u0430\u0432\u043a\u0430\n\n"
-        "\u041d\u0430\u043f\u0438\u0448\u0438 \u043b\u044e\u0431\u043e\u0439 \u0442\u0435\u043a\u0441\u0442 \u2014 \u043f\u043e\u043b\u0443\u0447\u0438\u0448\u044c \u043c\u0435\u043c\u043d\u044b\u0439 \u043e\u0442\u0432\u0435\u0442."
+        "\U0001f916 <b>Бот Мемных Тикток Цитат</b>\n\n"
+        "Рандомные мемные цитаты с картинками! \U0001f4aa\n\n"
+        "<b>Команды:</b>\n"
+        "/start \u2014 приветствие + цитата\n"
+        "/quote \u2014 рандомная цитата\n"
+        "/help \u2014 эта справка\n\n"
+        "Напиши любой текст \u2014 получишь мемный ответ."
     )
     await message.answer(text, parse_mode="HTML")
 
@@ -83,10 +77,7 @@ async def cmd_help(message: Message) -> None:
 @router.callback_query(F.data == "another_quote")
 async def callback_another_quote(callback: CallbackQuery) -> None:
     quote = get_random_quote()
-    caption = (
-        f'\U0001f3ac "{quote["text"]}"\n'
-        f"\u2014 \u0414\u0436\u0435\u0439\u0441\u043e\u043d \u0421\u0442\u0435\u0442\u0445\u0435\u043c"
-    )
+    caption = f'\U0001f9e0 "{quote["text"]}"'
     await callback.message.edit_media(
         media={
             "type": "photo",
@@ -104,10 +95,7 @@ async def inline_query_quote(inline_query: InlineQuery) -> None:
     results = []
     for i in range(10):
         q = get_random_quote()
-        caption = (
-            f'\U0001f3ac "{q["text"]}"\n'
-            f"\u2014 \u0414\u0436\u0435\u0439\u0441\u043e\u043d \u0421\u0442\u0435\u0442\u0445\u0435\u043c"
-        )
+        caption = f'\U0001f9e0 "{q["text"]}"'
         results.append(
             InlineQueryResultCachedPhoto(
                 id=str(i),
