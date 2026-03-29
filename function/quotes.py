@@ -1,109 +1,25 @@
+import json
 import random
+from pathlib import Path
 
-MEME_IMAGES = [
-    "https://upload.wikimedia.org/wikipedia/commons/c/cd/Surprised_look_Cat.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/3/30/Surprised_Black_Cat.JPG",
-    "https://upload.wikimedia.org/wikipedia/commons/0/00/Confused_cat.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/b/bd/Angry_cat.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/1/1a/Cat_crying_%28Lolcat%29.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/c/cc/Excited_kitten_meowing.png",
-    "https://upload.wikimedia.org/wikipedia/commons/3/30/Smiling_cat.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/2/22/Lolwut_cat.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/1/1c/Grumpy_Cat_meme_example.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/5/54/Cat_keyboard_gerrit.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/f/f5/Bad_Idea_Machine_lolcat.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/0/04/BusinessCat_2006_%28cropped%29.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/8/8a/Censorshiplolcat.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/2/25/Cat_biziness.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/2/2a/Cat_in_a_pot.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/4/42/Cat_wearing_sunglasses.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/4/4f/Cat_sticking_out_tongue.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/9/97/Breaded_Cat.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/1/17/Cat_in_box.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/a/a7/Blackcat-punishing-a-trolling-cat.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/5/59/C_O_O_K_I_E.png",
-    "https://upload.wikimedia.org/wikipedia/commons/e/ed/Cadt.png",
-    "https://upload.wikimedia.org/wikipedia/commons/a/ac/Charlie_-_gimme_zat_fing.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/6/6d/Orange_tabby_cat_sitting.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/f/fb/Cat_wild_nature.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/d/d4/CC-BY-SA-cat_may_has_-_captioned.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/5/52/Cat_Meme.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/d/d3/Jason_Statham_2018.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/5/50/Jason_Statham_2014.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/3/39/Jason_Statham_2.jpg",
-]
+QUOTES_PATH = Path(__file__).parent / "quotes.json"
 
-TIKTOK_QUOTES = [
-    "Чем дальше в лес — шкибиди доп ес ес",
-    "42, братуха!",
-    "Сигма сигма бой 💀",
-    "О-о! Чиназес! Сюда!",
-    "Сидим с бобром за столом, бобриха ест салат",
-    "Мага, сияй! ✨",
-    "Альтушка с Госуслуг",
-    "Скуф detected",
-    "Бу! Испугался? Не бойся. Я друг, я тебя не обижу",
-    "Бомбардиро Крокодило 🐊",
-    "Тралалеро Тралала",
-    "Балерина Капучино ☕",
-    "Триппи Троппа",
-    "Шпиониро Голубиро 🕊️",
-    "Лабубу",
-    "Чилловый парень — это я 😎",
-    "Никто, конечно же, не будет",
-    "Горячей воды не существует",
-    "Окак.",
-    "Бух, что случилось?",
-    "Ты имба! Это имба! 🏆",
-    "Пикми-пикми",
-    "У меня тильт, честно",
-    "Скибиди туалет 🚽",
-    "Вафлец",
-    "Фаннум-такс",
-    "Риззлер",
-    "Ватафак? 🤨",
-    "Ливни, бро",
-    "Это кринж, чел",
-    "Сорян, бро, я вахуе",
-    "Да это база, не спорь",
-    "Ультра редкий дроп 💎",
-    "Ну ты и чмоня",
-    "Ты не сигма, ты просто одинокий 💀",
-    "Дай ризз, бро",
-    "Я в делюжине",
-    "Ну и окак же так вышло?",
-    "Бегемот Булька 🦛",
-    "Птица Марбау 🐦",
-    "Терли свинки друг другу спинки 🐷",
-    "А ниче тот факт, что ты долбанутая?",
-    "Я плохая — ты хороший. Рот от гнева перекошен.",
-    "Кэп, спасибо",
-]
-
-RANDOM_REPLIES = [
-    "Скибиди доп доп ес ес 🚽",
-    "Окак.",
-    "Чиназес! Сюда!",
-    "42.",
-    "Сигма detected 💀",
-    "Ну ты и чмоня",
-    "Это кринж, чел",
-    "Пикми пикми пикми",
-    "Лабубуууу 🛍️",
-    "Ватафак я только что прочитал?",
-    "База.",
-    "Ультра редкий ответ дропнул",
-    "Сорян, бро",
-    "Триппи троппа троппа триппи 🌀",
-    "Нажми /quote и получишь базу",
-]
+_quotes: list[dict] = []
 
 
-def get_random_quote() -> dict:
-    text = random.choice(TIKTOK_QUOTES)
-    image = random.choice(MEME_IMAGES)
-    return {"text": text, "image": image}
+def _load_quotes() -> list[dict]:
+    global _quotes
+    if not _quotes:
+        with open(QUOTES_PATH, "r", encoding="utf-8") as f:
+            _quotes = json.load(f)
+    return _quotes
 
 
-def get_random_reply() -> str:
-    return random.choice(RANDOM_REPLIES)
+def get_random_quote() -> str:
+    quotes = _load_quotes()
+    return random.choice(quotes)["text"]
+
+
+def get_all_quotes() -> list[str]:
+    quotes = _load_quotes()
+    return [q["text"] for q in quotes]
