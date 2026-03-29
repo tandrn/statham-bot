@@ -65,9 +65,12 @@ def build_after_custom_keyboard() -> InlineKeyboardMarkup:
 
 
 async def _download_image(url: str) -> bytes:
-    async with aiohttp.ClientSession() as session:
+    headers = {"User-Agent": "StathamBot/1.0 (Telegram bot; +https://t.me/statham_foreva_bot)"}
+    async with aiohttp.ClientSession(headers=headers) as session:
         async with session.get(url) as resp:
-            return await resp.read()
+            data = await resp.read()
+            logger.info("Downloaded %s: %d bytes, status=%d, content-type=%s", url[:60], len(data), resp.status, resp.content_type)
+            return data
 
 
 async def _send_meme(message_or_callback, quote: str, reply_markup=None) -> None:
