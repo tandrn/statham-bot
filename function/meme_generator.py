@@ -1,10 +1,12 @@
 import random
 import io
+import logging
 import textwrap
 from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
 
-TEMPLATES_DIR = Path(__file__).parent / "templates"
+logger = logging.getLogger(__name__)
+
 FONT_PATH = Path(__file__).parent / "impact.ttf"
 
 STATHAM_TEMPLATES = [
@@ -22,61 +24,82 @@ STATHAM_TEMPLATES = [
 
 
 def _get_font(size: int) -> ImageFont.FreeTypeFont:
-    try:
-        return ImageFont.truetype(str(FONT_PATH), size)
-    except (OSError, IOError):
-        pass
-    try:
-        return ImageFont.truetype("impact.ttf", size)
-    except (OSError, IOError):
-        pass
-    try:
-        return ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", size)
-    except (OSError, IOError):
-        return ImageFont.load_default()
+    font_paths = [
+        str(FONT_PATH),
+        "impact.ttf",
+        "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
+        "/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf",
+        "/usr/share/fonts/truetype/freefont/FreeSansBold.ttf",
+        "/usr/share/fonts/TTF/DejaVuSans-Bold.ttf",
+    ]
+    for path in font_paths:
+        try:
+            font = ImageFont.truetype(path, size)
+            logger.info("Loaded font: %s (size %d)", path, size)
+            return font
+        except (OSError, IOError):
+            continue
+    logger.warning("No TTF font found, using default")
+    return ImageFont.load_default()
 
 
-def _draw_text_with_outline(draw: ImageDraw.ImageDraw, text: str, x: int, y: int, font: ImageFont.FreeTypeFont) -> None:
-    outline_color = "black"
-    text_color = "white"
-    for dx in [-2, -1, 0, 1, 2]:
-        for dy in [-2, -1, 0, 1, 2]:
-            if dx == 0 and dy == 0:
-                continue
-            draw.text((x + dx, y + dy), text, font=font, fill=outline_color)
-    draw.text((x, y), text, font=font, fill=text_color)
+def _draw_text_with_outline(
+    draw: ImageDraw.ImageDraw,
+    text: str,
+    x: int,
+    y: int,
+    font: ImageFont.FreeTypeFont,
+    outline_width: int = 3,
+) -> None:
+    for dx in range(-outline_width, outline_width + 1):
+        for dy in range(-outline_width, outline_width + 1):
+            if dx * dx + dy * dy <= outline_width * outline_width + 1:
+                draw.text((x + dx, y + dy), text, font=font, fill="black")
+    draw.text((x, y), text, font=font, fill="white")
 
 
 def generate_meme(image_bytes: bytes, quote: str) -> bytes:
+    logger.info("Generating meme with quote: %s", quote[:50])
     img = Image.open(io.BytesIO(image_bytes))
     img = img.convert("RGB")
 
     width, height = img.size
-    max_width = width - 40
+    logger.info("Image size: %dx%d", width, height)
 
-    font_size = max(28, min(60, width // 15))
+    font_size = max(24, min(56, width // 12))
     font = _get_font(font_size)
 
     draw = ImageDraw.Draw(img)
 
-    lines = textwrap.wrap(quote, width=30)
+    max_chars = max(15, width // 20)
+    lines = textwrap.wrap(quote, width=max_chars)
 
-    bbox = font.getbbox("Ay")
-    line_height = (bbox[3] - bbox[1]) + 10
+    try:
+        bbox = font.getbbox("Ay")
+        line_height = (bbox[3] - bbox[1]) + 12
+    except Exception:
+        line_height = font_size + 12
 
     total_text_height = len(lines) * line_height
-    y_start = height - total_text_height - 30
+    y_start = height - total_text_height - 25
 
     for i, line in enumerate(lines):
-        bbox = font.getbbox(line)
-        text_width = bbox[2] - bbox[0]
-        x = (width - text_width) // 2
+        try:
+            bbox = font.getbbox(line)
+            text_width = bbox[2] - bbox[0]
+        except Exception:
+            text_width = len(line) * font_size // 2
+
+        x = max(10, (width - text_width) // 2)
         y = y_start + i * line_height
-        _draw_text_with_outline(draw, line, x, y, font)
+
+        _draw_text_with_outline(draw, line, x, y, font, outline_width=3)
 
     output = io.BytesIO()
     img.save(output, format="JPEG", quality=90)
-    return output.getvalue()
+    result = output.getvalue()
+    logger.info("Meme generated: %d bytes", len(result))
+    return result
 
 
 def get_random_template_url() -> str:
